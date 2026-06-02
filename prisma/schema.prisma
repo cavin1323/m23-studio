@@ -1,0 +1,102 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Material {
+  RESIN
+  PLA
+  MIXED
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  SHIPPED
+  CANCELLED
+}
+
+enum CustomOrderStatus {
+  PENDING
+  REVIEWING
+  ACCEPTED
+  REJECTED
+  COMPLETED
+}
+
+model Product {
+  id              String   @id @default(cuid())
+  name            String
+  description     String
+  material        Material
+  scale           String
+  stock           Int
+  isMadeToOrder   Boolean  @default(false)
+  priceUnpainted  Float
+  pricePainted    Float
+  images          String[]
+  category        String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  orderItems      OrderItem[]
+}
+
+model Order {
+  id          String      @id @default(cuid())
+  totalAmount Float
+  currency    String      @default("USD")
+  status      OrderStatus @default(PENDING)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  items       OrderItem[]
+  customerId  String?
+  customer    Customer?   @relation(fields: [customerId], references: [id])
+}
+
+model OrderItem {
+  id              String  @id @default(cuid())
+  orderId         String
+  productId       String
+  variant         String  // "PAINTED" or "UNPAINTED"
+  quantity        Int
+  priceAtPurchase Float
+  order           Order   @relation(fields: [orderId], references: [id])
+  product         Product @relation(fields: [productId], references: [id])
+}
+
+model Customer {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  phone     String?
+  address   String?
+  orders    Order[]
+}
+
+model CustomOrder {
+  id              String            @id @default(cuid())
+  customerName    String
+  customerEmail   String
+  description     String
+  imageUploadUrl  String?
+  status          CustomOrderStatus @default(PENDING)
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+}
+
+model Currency {
+  id       String @id @default(cuid())
+  code     String @unique // e.g. "USD", "EUR", "JPY"
+  symbol   String // e.g. "$", "€", "¥"
+  rateToUSD Float  // Rate relative to 1 USD
+}
+
+model User {
+  id       String @id @default(cuid())
+  username String @unique
+  password String
+  role     String @default("ADMIN")
+}
