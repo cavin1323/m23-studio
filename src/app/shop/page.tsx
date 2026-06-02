@@ -51,7 +51,7 @@ export default function ShopPage() {
             <option value="EUR">EUR (€)</option>
             <option value="JPY">JPY (¥)</option>
             <option value="GBP">GBP (£)</option>
-            <option value="KWD">GBP (KWD)</option>
+            <option value="KWD">KWD (KWD)</option>
           </select>
         </div>
       </div>
