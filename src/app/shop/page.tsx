@@ -17,7 +17,20 @@ export default function ShopPage() {
   useEffect(() => {
     fetch('/api/products')
       .then(res => res.json())
-      .then(data => setProducts(data));
+      .then(data => {
+        if (Array.isArray(data)) {
+          setProducts(data);
+        } else if (data && typeof data === 'object' && data.products) {
+          setProducts(data.products);
+        } else {
+          console.error('Expected array of products but received:', data);
+          setProducts([]);
+        }
+      })
+      .catch(err => {
+        console.error('Fetch error:', err);
+        setProducts([]);
+      });
   }, []);
 
   return (
@@ -38,6 +51,7 @@ export default function ShopPage() {
             <option value="EUR">EUR (€)</option>
             <option value="JPY">JPY (¥)</option>
             <option value="GBP">GBP (£)</option>
+            <option value="KWD">GBP (KWD)</option>
           </select>
         </div>
       </div>
